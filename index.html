@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITS Bike Sharing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+        form {
+            margin: 10px 0;
+        }
+        input, select, textarea {
+            margin: 5px;
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+        .nav {
+            margin: 20px 0;
+        }
+        .nav button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ITS Bike Sharing System</h1>
+        
+        <div id="message" class="hidden"></div>
+        
+        <!-- Login/Register Section -->
+        <div id="auth-section" class="section">
+            <h2>Authentication</h2>
+            
+            <div id="login-form">
+                <h3>Login</h3>
+                <form onsubmit="login(event)">
+                    <input type="text" id="login-nrp" placeholder="NRP" required><br>
+                    <input type="password" id="login-password" placeholder="Password" required><br>
+                    <button type="submit">Login</button>
+                </form>
+                <button onclick="showRegister()">Register Instead</button>
+            </div>
+            
+            <div id="register-form" class="hidden">
+                <h3>Register</h3>
+                <form onsubmit="register(event)">
+                    <input type="text" id="reg-nrp" placeholder="NRP" required><br>
+                    <input type="text" id="reg-nama" placeholder="Full Name" required><br>
+                    <input type="email" id="reg-email" placeholder="Email" required><br>
+                    <input type="text" id="reg-hp" placeholder="Phone Number" required><br>
+                    <select id="reg-role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select><br>
+                    <input type="password" id="reg-password" placeholder="Password" required><br>
+                    <button type="submit">Register</button>
+                </form>
+                <button onclick="showLogin()">Login Instead</button>
+            </div>
+        </div>
+        
+        <!-- Main App Section -->
+        <div id="app-section" class="hidden">
+            <div id="user-info" class="section">
+                <h2>User Profile</h2>
+                <div id="profile-data"></div>
+                <button onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="nav">
+                <button onclick="showSection('stations')">Stations</button>
+                <button onclick="showSection('bikes')">Bikes</button>
+                <button onclick="showSection('rentals')">Rentals</button>
+                <button onclick="showSection('services')">Services</button>
+                <button onclick="showSection('admin')" id="admin-nav" class="hidden">Admin</button>
+            </div>
+            
+            <!-- Stations Section -->
+            <div id="stations-section" class="section">
+                <h2>Stations</h2>
+                <button onclick="loadStations()">Refresh Stations</button>
+                <div id="stations-list"></div>
+            </div>
+            
+            <!-- Bikes Section -->
+            <div id="bikes-section" class="section hidden">
+                <h2>Available Bikes</h2>
+                <label>Filter by Station:</label>
+                <select id="bike-station-filter" onchange="loadBikes()">
+                    <option value="">All Stations</option>
+                </select>
+                <button onclick="loadBikes()">Refresh Bikes</button>
+                <div id="bikes-list"></div>
+            </div>
+            
+            <!-- Rentals Section -->
+            <div id="rentals-section" class="section hidden">
+                <h2>Bike Rentals</h2>
+                
+                <div id="active-rental">
+                    <h3>Active Rental</h3>
+                    <div id="active-rental-data">No active rental</div>
+                </div>
+                
+                <div id="rent-bike">
+                    <h3>Rent a Bike</h3>
+                    <form onsubmit="rentBike(event)">
+                        <select id="rent-bike-id" required>
+                            <option value="">Select Bike</option>
+                        </select><br>
+                        <select id="rent-station-id" required>
+                            <option value="">Select Station</option>
+                        </select><br>
+                        <button type="submit">Rent Bike</button>
+                    </form>
+                </div>
+                
+                <div id="return-bike">
+                    <h3>Return Bike</h3>
+                    <form onsubmit="returnBike(event)">
+                        <input type="number" id="return-transaction-id" placeholder="Transaction ID" required><br>
+                        <select id="return-station-id" required>
+                            <option value="">Select Return Station</option>
+                        </select><br>
+                        <button type="submit">Return Bike</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3>My Rental History</h3>
+                    <button onclick="loadMyRentals()">Load History</button>
+                    <div id="rental-history"></div>
+                </div>
+            </div>
+            
+            <!-- Services Section -->
+            <div id="services-section" class="section hidden">
+                <h2>Services</h2>
+                <button onclick="loadServices()">Load Services</button>
+                <div id="services-list"></div>
+                
+                <div id="request-service">
+                    <h3>Request Service</h3>
+                    <form onsubmit="requestService(event)">
+                        <input type="number" id="service-transaction-id" placeholder="Transaction ID" required><br>
+                        <select id="service-id" required>
+                            <option value="">Select Service</option>
+                        </select><br>
+                        <button type="submit">Request Service</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Admin Section -->
+            <div id="admin-section" class="section hidden">
+                <h2>Admin Panel</h2>
+                
+                <div>
+                    <h3>Manage Stations</h3>
+                    <form onsubmit="createStation(event)">
+                        <input type="text" id="station-name" placeholder="Station Name" required><br>
+                        <input type="text" id="station-address" placeholder="Address" required><br>
+                        <select id="station-status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select><br>
+                        <button type="submit">Create Station</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3>Manage Bikes</h3>
+                    <form onsubmit="createBike(event)">
+                        <input type="text" id="bike-merk" placeholder="Brand" required><br>
+                        <input type="text" id="bike-tipe" placeholder="Type" required><br>
+                        <select id="bike-station-id">
+                            <option value="">Select Station</option>
+                        </select><br>
+                        <button type="submit">Create Bike</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3>Manage Services</h3>
+                    <form onsubmit="createService(event)">
+                        <input type="text" id="service-name" placeholder="Service Name" required><br>
+                        <input type="text" id="service-desc" placeholder="Description" required><br>
+                        <input type="number" id="service-price" placeholder="Price" required><br>
+                        <input type="number" id="service-base-cost" placeholder="Base Cost" required><br>
+                        <button type="submit">Create Service</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3>All Transactions</h3>
+                    <button onclick="loadAllTransactions()">Load All Transactions</button>
+                    <div id="admin-transactions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            if (authToken && currentUser) {
+                showApp();
+            }
+        });
+
+        // Utility Functions
+        function showMessage(message, type = 'success') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = message;
+            msgDiv.className = type;
+            msgDiv.classList.remove('hidden');
+            setTimeout(() => msgDiv.classList.add('hidden'), 5000);
+        }
+
+        function showSection(sectionName) {
+            const sections = ['stations', 'bikes', 'rentals', 'services', 'admin'];
+            sections.forEach(section => {
+                const elem = document.getElementById(section + '-section');
+                if (elem) {
+                    elem.classList.add('hidden');
+                }
+            });
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+            
+            // Load data for the section
+            switch(sectionName) {
+                case 'stations':
+                    loadStations();
+                    break;
+                case 'bikes':
+                    loadBikes();
+                    loadStationsForSelect();
+                    break;
+                case 'rentals':
+                    loadActiveRental();
+                    loadAvailableBikes();
+                    loadStationsForSelect();
+                    break;
+                case 'services':
+                    loadServices();
+                    break;
+                case 'admin':
+                    loadStationsForSelect();
+                    break;
+            }
+        }
+
+        function makeRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                }
+            };
+            
+            return fetch(API_BASE_URL + url, { ...defaultOptions, ...options })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                });
+        }
+
+        // Authentication Functions
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const nrp = document.getElementById('login-nrp').value;
+            const password = document.getElementById('login-password').value;
+
+            makeRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ nrp, password })
+            })
+            .then(data => {
+                authToken = data.access_token;
+                currentUser = data.user;
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showApp();
+                showMessage('Login successful!');
+            })
+            .catch(error => {
+                showMessage(error.message || 'Login failed', 'error');
+            });
+        }
+
+        function register(event) {
+            event.preventDefault();
+            const userData = {
+                nrp: document.getElementById('reg-nrp').value,
+                nama: document.getElementById('reg-nama').value,
+                email: document.getElementById('reg-email').value,
+                no_hp: document.getElementById('reg-hp').value,
+                role: document.getElementById('reg-role').value,
+                password: document.getElementById('reg-password').value
+            };
+
+            makeRequest('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(userData)
+            })
+            .then(data => {
+                showMessage('Registration successful! Please login.');
+                showLogin();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Registration failed', 'error');
+            });
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('app-section').classList.add('hidden');
+            showMessage('Logged out successfully');
+        }
+
+        function showApp() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+            
+            // Show user info
+            document.getElementById('profile-data').innerHTML = `
+                <p><strong>NRP:</strong> ${currentUser.nrp}</p>
+                <p><strong>Name:</strong> ${currentUser.nama}</p>
+                <p><strong>Email:</strong> ${currentUser.email}</p>
+                <p><strong>Role:</strong> ${currentUser.role}</p>
+            `;
+            
+            // Show admin nav if admin
+            if (currentUser.role === 'admin') {
+                document.getElementById('admin-nav').classList.remove('hidden');
+            }
+            
+            // Load initial data
+            showSection('stations');
+        }
+
+        // Station Functions
+        function loadStations() {
+            makeRequest('/stasiun/')
+            .then(data => {
+                const stationsHtml = `
+                    <table>
+                        <tr><th>ID</th><th>Name</th><th>Address</th><th>Status</th></tr>
+                        ${data.stasiun.map(station => `
+                            <tr>
+                                <td>${station.stasiun_id}</td>
+                                <td>${station.nama_stasiun}</td>
+                                <td>${station.alamat}</td>
+                                <td>${station.status}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('stations-list').innerHTML = stationsHtml;
+            })
+            .catch(error => {
+                showMessage('Failed to load stations', 'error');
+            });
+        }
+
+        function loadStationsForSelect() {
+            makeRequest('/stasiun/')
+            .then(data => {
+                const options = data.stasiun.map(station => 
+                    `<option value="${station.stasiun_id}">${station.nama_stasiun}</option>`
+                ).join('');
+                
+                // Update all station selects
+                const selects = ['bike-station-filter', 'rent-station-id', 'return-station-id', 'bike-station-id'];
+                selects.forEach(id => {
+                    const select = document.getElementById(id);
+                    if (select) {
+                        const currentValue = select.value;
+                        select.innerHTML = select.children[0].outerHTML + options;
+                        select.value = currentValue;
+                    }
+                });
+            });
+        }
+
+        function createStation(event) {
+            event.preventDefault();
+            const stationData = {
+                nama_stasiun: document.getElementById('station-name').value,
+                alamat: document.getElementById('station-address').value,
+                status: document.getElementById('station-status').value
+            };
+
+            makeRequest('/stasiun/', {
+                method: 'POST',
+                body: JSON.stringify(stationData)
+            })
+            .then(data => {
+                showMessage('Station created successfully!');
+                event.target.reset();
+                loadStations();
+                loadStationsForSelect();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to create station', 'error');
+            });
+        }
+
+        // Bike Functions
+        function loadBikes() {
+            const stationFilter = document.getElementById('bike-station-filter').value;
+            const url = stationFilter ? `/kendaraan/?stasiun_id=${stationFilter}&status=available` : '/kendaraan/?status=available';
+            
+            makeRequest(url)
+            .then(data => {
+                const bikesHtml = `
+                    <table>
+                        <tr><th>ID</th><th>Brand</th><th>Type</th><th>Status</th><th>Station</th></tr>
+                        ${data.kendaraan.map(bike => `
+                            <tr>
+                                <td>${bike.kendaraan_id}</td>
+                                <td>${bike.merk}</td>
+                                <td>${bike.tipe}</td>
+                                <td>${bike.status}</td>
+                                <td>${bike.stasiun_id || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('bikes-list').innerHTML = bikesHtml;
+            })
+            .catch(error => {
+                showMessage('Failed to load bikes', 'error');
+            });
+        }
+
+        function loadAvailableBikes() {
+            makeRequest('/kendaraan/?status=available')
+            .then(data => {
+                const options = data.kendaraan.map(bike => 
+                    `<option value="${bike.kendaraan_id}">${bike.merk} ${bike.tipe} (Station: ${bike.stasiun_id})</option>`
+                ).join('');
+                
+                document.getElementById('rent-bike-id').innerHTML = 
+                    '<option value="">Select Bike</option>' + options;
+            });
+        }
+
+        function createBike(event) {
+            event.preventDefault();
+            const bikeData = {
+                merk: document.getElementById('bike-merk').value,
+                tipe: document.getElementById('bike-tipe').value,
+                stasiun_id: parseInt(document.getElementById('bike-station-id').value),
+                status: 'available'
+            };
+
+            makeRequest('/kendaraan/', {
+                method: 'POST',
+                body: JSON.stringify(bikeData)
+            })
+            .then(data => {
+                showMessage('Bike created successfully!');
+                event.target.reset();
+                loadBikes();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to create bike', 'error');
+            });
+        }
+
+        // Rental Functions
+        function loadActiveRental() {
+            makeRequest('/transaksi/active')
+            .then(data => {
+                if (data.active_rental) {
+                    const rental = data.active_rental;
+                    document.getElementById('active-rental-data').innerHTML = `
+                        <p><strong>Transaction ID:</strong> ${rental.transaksi_id}</p>
+                        <p><strong>Bike ID:</strong> ${rental.kendaraan_id}</p>
+                        <p><strong>Pickup Station:</strong> ${rental.stasiun_ambil_id}</p>
+                        <p><strong>Start Time:</strong> ${new Date(rental.tanggal_pinjam).toLocaleString()}</p>
+                        <p><strong>Reference:</strong> ${rental.reference_number}</p>
+                    `;
+                } else {
+                    document.getElementById('active-rental-data').textContent = 'No active rental';
+                }
+            });
+        }
+
+        function rentBike(event) {
+            event.preventDefault();
+            const rentalData = {
+                kendaraan_id: parseInt(document.getElementById('rent-bike-id').value),
+                stasiun_ambil_id: parseInt(document.getElementById('rent-station-id').value)
+            };
+
+            makeRequest('/transaksi/rent', {
+                method: 'POST',
+                body: JSON.stringify(rentalData)
+            })
+            .then(data => {
+                showMessage('Bike rented successfully!');
+                event.target.reset();
+                loadActiveRental();
+                loadAvailableBikes();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to rent bike', 'error');
+            });
+        }
+
+        function returnBike(event) {
+            event.preventDefault();
+            const returnData = {
+                transaksi_id: parseInt(document.getElementById('return-transaction-id').value),
+                stasiun_kembali_id: parseInt(document.getElementById('return-station-id').value)
+            };
+
+            makeRequest('/transaksi/return', {
+                method: 'POST',
+                body: JSON.stringify(returnData)
+            })
+            .then(data => {
+                showMessage('Bike returned successfully!');
+                event.target.reset();
+                loadActiveRental();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to return bike', 'error');
+            });
+        }
+
+        function loadMyRentals() {
+            makeRequest('/transaksi/my-rentals')
+            .then(data => {
+                const rentalsHtml = `
+                    <table>
+                        <tr><th>ID</th><th>Bike</th><th>Pickup</th><th>Return</th><th>Status</th><th>Date</th></tr>
+                        ${data.rentals.map(rental => `
+                            <tr>
+                                <td>${rental.transaksi_id}</td>
+                                <td>${rental.kendaraan_id}</td>
+                                <td>${rental.stasiun_ambil_id}</td>
+                                <td>${rental.stasiun_kembali_id || 'N/A'}</td>
+                                <td>${rental.status_transaksi}</td>
+                                <td>${new Date(rental.tanggal_pinjam).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('rental-history').innerHTML = rentalsHtml;
+            });
+        }
+
+        // Service Functions
+        function loadServices() {
+            makeRequest('/layanan/?active_only=true')
+            .then(data => {
+                const servicesHtml = `
+                    <table>
+                        <tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th></tr>
+                        ${data.layanan.map(service => `
+                            <tr>
+                                <td>${service.layanan_id}</td>
+                                <td>${service.nama_layanan}</td>
+                                <td>${service.deskripsi}</td>
+                                <td>${service.harga}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('services-list').innerHTML = servicesHtml;
+                
+                // Update service select
+                const options = data.layanan.map(service => 
+                    `<option value="${service.layanan_id}">${service.nama_layanan} - $${service.harga}</option>`
+                ).join('');
+                document.getElementById('service-id').innerHTML = 
+                    '<option value="">Select Service</option>' + options;
+            });
+        }
+
+        function requestService(event) {
+            event.preventDefault();
+            const serviceData = {
+                transaksi_id: parseInt(document.getElementById('service-transaction-id').value),
+                layanan_id: parseInt(document.getElementById('service-id').value)
+            };
+
+            makeRequest('/layanan/transactions', {
+                method: 'POST',
+                body: JSON.stringify(serviceData)
+            })
+            .then(data => {
+                showMessage('Service requested successfully!');
+                event.target.reset();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to request service', 'error');
+            });
+        }
+
+        function createService(event) {
+            event.preventDefault();
+            const serviceData = {
+                nama_layanan: document.getElementById('service-name').value,
+                deskripsi: document.getElementById('service-desc').value,
+                harga: parseFloat(document.getElementById('service-price').value),
+                biaya_dasar: parseFloat(document.getElementById('service-base-cost').value)
+            };
+
+            makeRequest('/layanan/', {
+                method: 'POST',
+                body: JSON.stringify(serviceData)
+            })
+            .then(data => {
+                showMessage('Service created successfully!');
+                event.target.reset();
+                loadServices();
+            })
+            .catch(error => {
+                showMessage(error.message || 'Failed to create service', 'error');
+            });
+        }
+
+        // Admin Functions
+        function loadAllTransactions() {
+            makeRequest('/transaksi/')
+            .then(data => {
+                const transactionsHtml = `
+                    <table>
+                        <tr><th>ID</th><th>User</th><th>Bike</th><th>Status</th><th>Date</th></tr>
+                        ${data.transaksi.map(transaction => `
+                            <tr>
+                                <td>${transaction.transaksi_id}</td>
+                                <td>${transaction.user_nrp}</td>
+                                <td>${transaction.kendaraan_id}</td>
+                                <td>${transaction.status_transaksi}</td>
+                                <td>${new Date(transaction.tanggal_pinjam).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+                document.getElementById('admin-transactions').innerHTML = transactionsHtml;
+            });
+        }
+    </script>
+</body>
+</html>
