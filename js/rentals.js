@@ -48,32 +48,6 @@ function loadActiveRentals() { // Nama fungsi diubah untuk kejelasan
 }
 
 /**
- * Memproses penyewaan sepeda baru.
- * Tidak ada perubahan besar, hanya memanggil loadActiveRentals() yang baru.
- */
-function rentBike(event) {
-    event.preventDefault();
-    const rentalData = {
-        kendaraan_id: parseInt(document.getElementById('rent-bike-id').value),
-        stasiun_ambil_id: parseInt(document.getElementById('rent-station-id').value)
-    };
-
-    if (isNaN(rentalData.kendaraan_id) || isNaN(rentalData.stasiun_ambil_id)) {
-        showMessage('Please select a bike and a station.', 'error');
-        return;
-    }
-
-    makeRequest('/transaksi/rent', { method: 'POST', body: JSON.stringify(rentalData) })
-    .then(data => {
-        showMessage('Bike rented successfully!');
-        event.target.reset();
-        loadActiveRentals(); // Panggil fungsi yang sudah diperbarui
-        loadAvailableBikes();
-    })
-    .catch(error => showMessage(error.message || 'Failed to rent bike', 'error'));
-}
-
-/**
  * Memproses pengembalian sepeda.
  * Logika diubah untuk memastikan ID Transaksi diisi.
  */

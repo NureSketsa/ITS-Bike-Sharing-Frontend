@@ -54,7 +54,7 @@
                 <button onclick="showSection('stations')">Stations</button>
                 <button onclick="showSection('bikes')">Bikes</button>
                 <button onclick="showSection('rentals')">Rentals</button>
-                <button onclick="showSection('services')">Services</button>
+                <!-- <button onclick="showSection('services')">Services</button> -->
                 <button onclick="showSection('admin')" id="admin-nav" class="hidden">Admin</button>
             </div>
             
@@ -82,7 +82,7 @@
                     <div id="active-rental-data">No active rental</div>
                 </div>
                 
-                <div id="rent-bike">
+                <!-- <div id="rent-bike">
                     <h3>Rent a Bike</h3>
                     <form id="rentBikeForm">
                         <select id="rent-bike-id" required>
@@ -93,7 +93,7 @@
                         </select><br>
                         <button type="submit">Rent Bike</button>
                     </form>
-                </div>
+                </div> -->
                 
                 <div id="return-bike">
                     <h3>Return Bike</h3>
@@ -113,7 +113,7 @@
                 </div>
             </div>
             
-            <div id="services-section" class="section hidden">
+            <!-- <div id="services-section" class="section hidden">
                 <h2>Services</h2>
                 <button onclick="loadServices()">Load Services</button>
                 <div id="services-list"></div>
@@ -128,7 +128,7 @@
                         <button type="submit">Request Service</button>
                     </form>
                 </div>
-            </div>
+            </div> -->
             
             <div id="admin-section" class="section hidden">
                 <h2>Admin Panel</h2>
@@ -176,6 +176,26 @@
                 </div>
             </div>
         </div>
+        
+        <div id="rent-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeRentModal()">&times;</span>
+                <h2>Rent This Bike</h2>
+                <form id="rentModalForm">
+                    <p>You are about to rent bike <strong id="modal-bike-info"></strong>.</p>
+
+                    <input type="hidden" id="modal-kendaraan-id">
+                    <input type="hidden" id="modal-stasiun-id">
+
+                    <label for="modal-deposit">Enter Deposit Amount (Rp):</label>
+                    <input type="number" id="modal-deposit" placeholder="e.g., 50000" required>
+
+                    <button type="submit">Confirm Rent</button>
+                    <button type="button" onclick="closeRentModal()">Cancel</button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <script src="js/config.js"></script>

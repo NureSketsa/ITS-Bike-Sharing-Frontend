@@ -1,24 +1,39 @@
-// js/app.js - Core UI and Initialization Logic (REWORKED & SAFER)
+
+
+// js/app.js - Core UI and Initialization Logic (REWORKED)
 
 // --- Event Listeners ---
 document.addEventListener('DOMContentLoaded', function() {
-    // Cek jika user sudah login saat halaman dimuat
-    if (authToken && currentUser) {
-        showApp();
-    }
-
-    // Attach event listeners to forms. Functions are in their respective modules.
+    // ... (listener untuk login, register, logout tetap sama) ...
     document.getElementById('loginForm').addEventListener('submit', login);
     document.getElementById('registerForm').addEventListener('submit', register);
     document.getElementById('logoutButton').addEventListener('click', logout);
+
+    // Form listeners untuk feature modules
     document.getElementById('createStationForm').addEventListener('submit', createStation);
     document.getElementById('createBikeForm').addEventListener('submit', createBike);
     document.getElementById('createServiceForm').addEventListener('submit', createService);
-    document.getElementById('rentBikeForm').addEventListener('submit', rentBike);
     document.getElementById('returnBikeForm').addEventListener('submit', returnBike);
     document.getElementById('requestServiceForm').addEventListener('submit', requestService);
-});
+    
+    // LISTENER BARU: Untuk form sewa di dalam modal
+    document.getElementById('rentModalForm').addEventListener('submit', submitRentFromModal);
 
+    // LISTENER BARU: Untuk semua tombol "Sewa" di daftar sepeda
+    document.getElementById('bikes-list').addEventListener('click', function(event) {
+        if (event.target && event.target.classList.contains('rent-button')) {
+            const button = event.target;
+            const kendaraanId = button.dataset.kendaraanId;
+            const stasiunId = button.dataset.stasiunId;
+            const bikeInfo = button.dataset.bikeInfo;
+            openRentModal(kendaraanId, stasiunId, bikeInfo);
+        }
+    });
+
+    if (authToken && currentUser) {
+        showApp();
+    }
+});
 
 // --- UI Utility Functions ---
 function showMessage(message, type = 'success') {
@@ -55,7 +70,7 @@ function showSection(sectionName) {
             // FIXED: Memanggil semua fungsi yang diperlukan untuk halaman rental
             // secara independen untuk mencegah error berantai.
             loadActiveRentals(); // Menggunakan versi fungsi yang sudah diperbaiki
-            loadAvailableBikes(); // Ini akan mengisi dropdown sepeda
+            // loadAvailableBikes(); // Ini akan mengisi dropdown sepeda
             loadStationsForSelect(); // Ini akan mengisi dropdown stasiun
             break;
         case 'services':
