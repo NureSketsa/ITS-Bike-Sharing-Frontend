@@ -14,21 +14,43 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('createBikeForm').addEventListener('submit', createBike);
     // document.getElementById('createServiceForm').addEventListener('submit', createService);
     document.getElementById('returnBikeForm').addEventListener('submit', returnBike);
+    
     // document.getElementById('requestServiceForm').addEventListener('submit', requestService);
     
     // LISTENER BARU: Untuk form sewa di dalam modal
     document.getElementById('rentModalForm').addEventListener('submit', submitRentFromModal);
 
     // LISTENER BARU: Untuk semua tombol "Sewa" di daftar sepeda
-    document.getElementById('bikes-list').addEventListener('click', function(event) {
-        if (event.target && event.target.classList.contains('rent-button')) {
-            const button = event.target;
-            const kendaraanId = button.dataset.kendaraanId;
-            const stasiunId = button.dataset.stasiunId;
-            const bikeInfo = button.dataset.bikeInfo;
-            openRentModal(kendaraanId, stasiunId, bikeInfo);
-        }
-    });
+    // document.getElementById('bikes-list').addEventListener('click', function(event) {
+    //     if (event.target && event.target.classList.contains('rent-button')) {
+    //         const button = event.target;
+    //         const kendaraanId = button.dataset.kendaraanId;
+    //         const stasiunId = button.dataset.stasiunId;
+    //         const bikeInfo = button.dataset.bikeInfo;
+    //         openRentModal(kendaraanId, stasiunId, bikeInfo);
+    //     }
+    // });
+
+    const bikesListContainer = document.getElementById('bikes-list');
+    if (bikesListContainer) {
+        bikesListContainer.addEventListener('click', function(event) {
+            // Cek apakah yang diklik adalah elemen dengan class 'rent-button'
+            const button = event.target.closest('.rent-button');
+            if (button) {
+                
+                console.log("Tombol 'Sewa' terdeteksi oleh listener terpusat!"); // Untuk debugging
+
+                // Ambil data dari atribut data-* tombol yang diklik
+                const kendaraanId = button.dataset.kendaraanId;
+                const stasiunId = button.dataset.stasiunId;
+                const bikeInfo = button.dataset.bikeInfo;
+
+                // Panggil fungsi openRentModal dengan data yang sudah diambil
+                openRentModal(kendaraanId, stasiunId, bikeInfo);
+                console.log("Tombol 'Sewa'ahaahht!"); 
+            }
+        });
+    }
 
     if (authToken && currentUser) {
         showApp();
@@ -109,7 +131,7 @@ function showApp() {
             document.getElementById('admin-nav').classList.remove('hidden');
         } else {
             document.getElementById('admin-nav').classList.add('hidden');
-        }
+        }   
     }
     
     showSection('stations'); // Tampilkan halaman default setelah login

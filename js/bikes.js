@@ -17,14 +17,7 @@ function loadBikes() {
         const bikesHtml = `
             <table>
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Brand</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Station</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>ID</th><th>Brand</th><th>Type</th><th>Status</th><th>Station</th><th>Action</th></tr>
                 </thead>
                 <tbody>
                     ${data.kendaraan.map(bike => `
@@ -32,15 +25,14 @@ function loadBikes() {
                             <td>${bike.kendaraan_id}</td>
                             <td>${bike.merk}</td>
                             <td>${bike.tipe}</td>
-                            <td>${bike.status}</td>
+                            <td><span class="status-badge status-available">${bike.status}</span></td>
                             <td>${bike.stasiun_id || 'N/A'}</td>
-                            <td>
+                             <td>
                                 <button class="rent-button" 
                                     data-kendaraan-id="${bike.kendaraan_id}" 
                                     data-stasiun-id="${bike.stasiun_id}"
-                                    data-bike-info="${bike.merk} ${bike.tipe}"
-                                    onclick="openRentModal(${bike.kendaraan_id}, ${bike.stasiun_id}, '${bike.merk} ${bike.tipe}')">
-                                    Rent
+                                    data-bike-info="${bike.merk} ${bike.tipe}">
+                                    Sewa
                                 </button>
                             </td>
                         </tr>
@@ -57,36 +49,16 @@ function loadBikes() {
  * Open rental modal with service selection
  */
 function openRentModal(kendaraanId, stasiunId, bikeInfo) {
-    console.log("1. openRentModal dipanggil untuk sepeda ID:", kendaraanId);
+    // Isi data ke form modal
+    document.getElementById('modal-kendaraan-id').value = kendaraanId;
+    document.getElementById('modal-stasiun-id').value = stasiunId;
+    document.getElementById('modal-bike-info').textContent = bikeInfo;
     
-    loadAvailableServices()
-    .then(services => {
-        console.log("2. Data layanan berhasil diterima:", services);
-        
-        try {
-            // Populate modal with bike info and services
-            document.getElementById('modal-kendaraan-id').value = kendaraanId;
-            document.getElementById('modal-stasiun-id').value = stasiunId;
-            document.getElementById('modal-bike-info').textContent = bikeInfo;
-            console.log("3. Info sepeda berhasil dimasukkan ke modal.");
-
-            // Update services section in modal
-            updateServicesInModal(services);
-            console.log("4. Fungsi updateServicesInModal selesai dijalankan.");
-
-            // Show modal
-            document.getElementById('rent-modal').style.display = 'block';
-            console.log("5. Modal seharusnya sekarang terlihat.");
-
-        } catch (e) {
-            console.error("7. TERJADI ERROR FATAL SAAT MENYIAPKAN MODAL:", e);
-            showMessage('Error preparing rental form. Check console.', 'error');
-        }
-    })
-    .catch(error => {
-        console.error("6. Terjadi error di dalam openRentModal (kemungkinan dari makeRequest):", error);
-        showMessage('Could not open rental modal.', 'error');
-    });
+    const modal = document.getElementById('rent-modal');
+    // HAPUS class 'hidden' yang memiliki !important
+    modal.classList.remove('hidden'); 
+    // ATUR display untuk menampilkannya
+    modal.style.display = 'flex';     
 }
 
 /**
@@ -102,6 +74,7 @@ function loadAvailableServices() {
     })
     .catch(() => []);
 }
+
 
 /**
  * Update services section in rental modal
@@ -151,69 +124,73 @@ function updateServicesInModal(services) {
 /**
  * Close rental modal and reset form
  */
+
 function closeRentModal() {
-    document.getElementById('rent-modal').style.display = 'none';
-    document.getElementById('rentModalForm').reset();
+    const modal = document.getElementById('rent-modal');
+    // SEMBUNYIKAN lagi dengan style
+    modal.style.display = 'none';
+    // TAMBAHKAN KEMBALI class 'hidden'
+    modal.classList.add('hidden');
     
-    // Uncheck all service checkboxes
-    const checkboxes = document.querySelectorAll('input[name="selected-services"]');
-    checkboxes.forEach(cb => cb.checked = false);
+    document.getElementById('rentModalForm').reset();
 }
 
 /**
  * Submit rental request with selected services
  */
+// js/bikes.js - Gantikan fungsi ini
+
+/**
+ * Submit rental request from modal with validation
+ */
 function submitRentFromModal(event) {
     event.preventDefault();
 
-    const kendaraanId = parseInt(document.getElementById('modal-kendaraan-id').value);
-    const stasiunId = parseInt(document.getElementById('modal-stasiun-id').value);
-    const deposit = parseFloat(document.getElementById('modal-deposit').value);
+    const rentalData = {
+        kendaraan_id: parseInt(document.getElementById('modal-kendaraan-id').value),
+        stasiun_ambil_id: parseInt(document.getElementById('modal-stasiun-id').value),
+        deposit_dipegang: parseFloat(document.getElementById('modal-deposit').value)
+    };
 
-    if (isNaN(deposit) || deposit <= 0) {
+    // --- TAMBAHKAN BLOK DIAGNOSIS INI ---
+    // Log ini akan menunjukkan apa yang akan dikirim ke backend
+    console.log("Data to be sent to backend:", rentalData);
+
+    // Validasi penting untuk memastikan ID tidak kosong/NaN
+    if (isNaN(rentalData.kendaraan_id) || isNaN(rentalData.stasiun_ambil_id)) {
+        showMessage('Error: Bike ID or Station ID is invalid. Cannot proceed.', 'error');
+        console.error("Fatal Error: kendaraan_id or stasiun_ambil_id is NaN. Aborting request.", rentalData);
+        // Re-enable submit button
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        if(submitBtn) submitBtn.disabled = false;
+        return; 
+    }
+    // --- AKHIR BLOK DIAGNOSIS ---
+
+
+    if (isNaN(rentalData.deposit_dipegang) || rentalData.deposit_dipegang < 0) {
         showMessage('Please enter a valid deposit amount.', 'error');
         return;
     }
 
-    // Get selected services
-    const selectedServices = [];
-    const serviceCheckboxes = document.querySelectorAll('input[name="selected-services"]:checked');
-    serviceCheckboxes.forEach(cb => {
-        selectedServices.push({
-            layanan_id: parseInt(cb.value),
-            harga: parseFloat(cb.dataset.price)
-        });
-    });
-
-    const rentalData = {
-        kendaraan_id: kendaraanId,
-        stasiun_ambil_id: stasiunId,
-        deposit_dipegang: deposit,
-        selected_services: selectedServices
-    };
-
-    // First, rent the bike
     makeRequest('/transaksi/rent', { method: 'POST', body: JSON.stringify(rentalData) })
     .then(data => {
-        const transactionId = data.data.transaksi_id;
-        
-        // If services were selected, add them to the rental
-        if (selectedServices.length > 0) {
-            return addServicesToTransaction(transactionId, selectedServices);
-        }
-        
-        return Promise.resolve();
-    })
-    .then(() => {
-        showMessage('Bike rented successfully' + (selectedServices.length > 0 ? ' with selected services!' : '!'));
+        showMessage('Bike rented successfully!');
         closeRentModal();
         loadBikes();
-        // Refresh active rentals if user switches to rentals section
         if (typeof loadActiveRentals === 'function') {
             loadActiveRentals();
         }
     })
-    .catch(error => showMessage(error.message || 'Failed to rent bike', 'error'));
+    .catch(error => {
+        showMessage(error.message || 'Failed to rent bike', 'error');
+        // Re-enable submit button on failure
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        if(submitBtn) {
+            submitBtn.textContent = '✅ Confirm Rent';
+            submitBtn.disabled = false;
+        }
+    });
 }
 
 /**
@@ -255,7 +232,6 @@ function createBike(event) {
     })
     .catch(error => showMessage(error.message || 'Failed to create bike', 'error'));
 }
-
 /**
  * Load bike maintenance/report logs for admin
  */
