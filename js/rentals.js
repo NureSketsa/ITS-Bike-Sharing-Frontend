@@ -86,6 +86,8 @@ function returnBike(event) {
 /**
  * Load user's rental history
  */
+// public/js/rentals.js
+
 function loadMyRentals() {
     makeRequest('/transaksi/my-rentals')
     .then(response => {
@@ -111,9 +113,10 @@ function loadMyRentals() {
                     ${rentals.map(rental => `
                         <tr>
                             <td>${rental.transaksi_id}</td>
-                            <td>${rental.kendaraan_id}</td>
-                            <td>${rental.stasiun_ambil_id}</td>
-                            <td>${rental.stasiun_kembali_id || 'N/A'}</td>
+                            <td>${rental.merk_kendaraan || 'N/A'}</td>
+                            
+                            <td>${rental.nama_stasiun_ambil || 'N/A'}</td>
+                            <td>${rental.nama_stasiun_kembali || 'N/A'}</td>
                             <td>${rental.status_transaksi}</td>
                             <td>Rp ${rental.total_biaya || 0}</td>
                             <td>${new Date(rental.waktu_mulai).toLocaleString()}</td>
