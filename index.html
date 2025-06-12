@@ -3,537 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITS Bike Sharing</title>
+    <title>ITS Bike Sharing System</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .section {
-            background: white;
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* Authentication Forms */
-        #auth-section {
-            max-width: 450px;
-            margin: 0 auto;
-        }
-
-        #auth-section h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #4a5568;
-        }
-
-        #auth-section h3 {
-            margin-bottom: 20px;
-            color: #2d3748;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        input, select, button {
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .secondary-btn {
-            background: transparent !important;
-            color: #667eea !important;
-            border: 2px solid #667eea !important;
-        }
-
-        .secondary-btn:hover {
-            background: #667eea !important;
-            color: white !important;
-        }
-
-        /* Navigation */
-        .nav {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .nav button {
-            flex: 1;
-            min-width: 120px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #4a5568;
-            border: 2px solid transparent;
-        }
-
-        .nav button:hover, .nav button.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        tr:hover {
-            background-color: #f7fafc;
-        }
-
-        /* Buttons in tables */
-        .rent-button, .report-btn, .service-btn {
-            padding: 6px 12px;
-            font-size: 12px;
-            margin: 2px;
-            border-radius: 6px;
-        }
-
-        .rent-button {
-            background: #38a169;
-            border-color: #38a169;
-        }
-
-        .report-btn {
-            background: #e53e3e;
-            border-color: #e53e3e;
-        }
-
-        .service-btn {
-            background: #3182ce;
-            border-color: #3182ce;
-        }
-
-        /* Modal */
-        .modal {
-            display: none; /* Defaultnya tetap disembunyikan */
-            position: fixed; 
-            z-index: 1000; /* PASTIKAN z-index tinggi agar di atas segalanya */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            
-            /* Tambahan untuk memastikan modal tidak transparan atau tersembunyi */
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .close-button {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .close-button:hover {
-            background: #f7fafc;
-            color: #e53e3e;
-        }
-
-        /* Service Options */
-        .service-option {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .service-option:hover {
-            background: #f7fafc;
-            border-color: #667eea;
-        }
-
-        .service-option label {
-            cursor: pointer;
-            display: block;
-        }
-
-        /* Search and Filter */
-        .bike-search, .filter-section {
-            margin: 15px 0;
-        }
-
-        .bike-search input {
-            width: 100%;
-            max-width: 300px;
-        }
-
-        /* Messages */
-        #message {
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-
-        #message.success {
-            background: #c6f6d5;
-            color: #2f855a;
-            border: 1px solid #9ae6b4;
-        }
-
-        #message.error {
-            background: #fed7d7;
-            color: #c53030;
-            border: 1px solid #fc8181;
-        }
-
-        /* User Profile */
-        #profile-data {
-            background: #f7fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        /* Admin Section */
-        #admin-section > div {
-            margin: 25px 0;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-        }
-
-        #admin-section h3 {
-            color: #4a5568;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #667eea;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .nav {
-                flex-direction: column;
-            }
-
-            .nav button {
-                min-width: auto;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px 4px;
-            }
-
-            .modal-content {
-                padding: 20px;
-                margin: 10px;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background: #c6f6d5;
-            color: #2f855a;
-        }
-
-        .status-inactive {
-            background: #fed7d7;
-            color: #c53030;
-        }
-
-        .status-available {
-            background: #bee3f8;
-            color: #2b6cb0;
-        }
-    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="https://www.its.ac.id/wp-content/uploads/2020/07/Lambang-ITS-2-300x300.png" alt="ITS Logo" class="its-logo">
+                    <div class="title-section">
+                        <h1>Institut Teknologi Sepuluh Nopember</h1>
+                        <h2>Bike Sharing System</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <h1>🚴‍♂️ ITS Bike Sharing System</h1>
-        
         <div id="message" class="hidden"></div>
         
         <div id="auth-section" class="section">
-            <h2>🔐 Authentication</h2>
+            <div class="auth-header">
+                <h2>Authentication</h2>
+                <p>Please login to access the ITS Bike Sharing System</p>
+            </div>
             
             <div id="login-form">
                 <h3>Sign In to Your Account</h3>
                 <form id="loginForm">
-                    <input type="text" id="login-nrp" placeholder="Enter your NRP" required>
-                    <input type="password" id="login-password" placeholder="Enter your password" required>
-                    <button type="submit">Sign In</button>
+                    <div class="form-group">
+                        <label for="login-nrp">NRP (Student/Staff ID)</label>
+                        <input type="text" id="login-nrp" placeholder="Enter your NRP" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
                 </form>
-                <button class="secondary-btn" onclick="showRegister()">Don't have an account? Register</button>
+                <button class="btn-secondary" onclick="showRegister()">Don't have an account? Register</button>
             </div>
             
             <div id="register-form" class="hidden">
                 <h3>Create New Account</h3>
                 <form id="registerForm">
-                    <input type="text" id="reg-nrp" placeholder="NRP (Student/Staff ID)" required>
-                    <input type="text" id="reg-nama" placeholder="Full Name" required>
-                    <input type="email" id="reg-email" placeholder="Email Address" required>
-                    <input type="text" id="reg-hp" placeholder="Phone Number" required>
-                    <select id="reg-role">
-                        <option value="user">Regular User</option>
-                        <option value="admin">System Admin</option>
-                    </select>
-                    <input type="password" id="reg-password" placeholder="Create Password" required>
-                    <button type="submit">Create Account</button>
+                    <div class="form-group">
+                        <label for="reg-nrp">NRP (Student/Staff ID)</label>
+                        <input type="text" id="reg-nrp" placeholder="NRP" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-nama">Full Name</label>
+                        <input type="text" id="reg-nama" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Email Address</label>
+                        <input type="email" id="reg-email" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-hp">Phone Number</label>
+                        <input type="text" id="reg-hp" placeholder="Phone Number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-role">Role</label>
+                        <select id="reg-role">
+                            <option value="user">Regular User</option>
+                            <option value="admin">System Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Password</label>
+                        <input type="password" id="reg-password" placeholder="Create Password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
                 </form>
-                <button class="secondary-btn" onclick="showLogin()">Already have an account? Sign In</button>
+                <button class="btn-secondary" onclick="showLogin()">Already have an account? Sign In</button>
             </div>
         </div>
         
         <div id="app-section" class="hidden">
             <div id="user-info" class="section">
-                <h2>👤 User Profile</h2>
+                <h2>User Profile</h2>
                 <div id="profile-data"></div>
-                <button id="logoutButton" class="secondary-btn">Sign Out</button>
+                <button id="logoutButton" class="btn-secondary">Sign Out</button>
             </div>
             
-            <div class="nav">
-                <button onclick="showSection('stations')" id="stations-nav">🚏 Stations</button>
-                <button onclick="showSection('bikes')" id="bikes-nav">🚲 Available Bikes</button>
-                <button onclick="showSection('rentals')" id="rentals-nav">📋 My Rentals</button>
-                <button onclick="showSection('admin')" id="admin-nav" class="hidden">⚙️ Admin Panel</button>
+            <div class="nav-tabs">
+                <button onclick="showSection('stations')" id="stations-nav" class="nav-tab active">Stations</button>
+                <button onclick="showSection('bikes')" id="bikes-nav" class="nav-tab">Available Bikes</button>
+                <button onclick="showSection('rentals')" id="rentals-nav" class="nav-tab">My Rentals</button>
+                <button onclick="showSection('admin')" id="admin-nav" class="nav-tab hidden">Admin Panel</button>
             </div>
             
             <div id="stations-section" class="section">
-                <h2>🚏 Bike Stations</h2>
-                <p>Find the nearest bike station and check availability.</p>
-                <button onclick="loadStations()">🔄 Refresh Stations</button>
+                <div class="section-header">
+                    <h2>Bike Stations</h2>
+                    <p>Find the nearest bike station and check availability.</p>
+                </div>
+                <button onclick="loadStations()" class="btn-secondary">Refresh Stations</button>
                 <div id="stations-list"></div>
             </div>
             
             <div id="bikes-section" class="section hidden">
-                <h2>🚲 Available Bikes</h2>
-                <p>Browse and rent available bikes from different stations.</p>
+                <div class="section-header">
+                    <h2>Available Bikes</h2>
+                    <p>Browse and rent available bikes from different stations.</p>
+                </div>
                 
                 <div class="filter-section">
-                    <label for="bike-station-filter">🏢 Filter by Station:</label>
-                    <select id="bike-station-filter" onchange="loadBikes()">
-                        <option value="">All Stations</option>
-                    </select>
-                    <button onclick="loadBikes()">🔄 Refresh Bikes</button>
+                    <div class="form-group">
+                        <label for="bike-station-filter">Filter by Station:</label>
+                        <select id="bike-station-filter" onchange="loadBikes()">
+                            <option value="">All Stations</option>
+                        </select>
+                    </div>
+                    <button onclick="loadBikes()" class="btn-secondary">Refresh Bikes</button>
                 </div>
                 
                 <div id="bikes-list"></div>
             </div>
             
             <div id="rentals-section" class="section hidden">
-                <h2>📋 Bike Rentals</h2>
+                <div class="section-header">
+                    <h2>Bike Rentals</h2>
+                </div>
                 
-                <div id="active-rental">
-                    <h3>🚴‍♀️ Active Rentals</h3>
+                <div id="active-rental" class="subsection">
+                    <h3>Active Rentals</h3>
                     <div id="active-rental-data">
                         <div class="loading"></div> Loading active rentals...
                     </div>
                 </div>
                 
-                <div id="return-bike">
-                    <h3>📍 Return Bike</h3>
+                <div id="return-bike" class="subsection">
+                    <h3>Return Bike</h3>
                     <p>Return your rented bike to any available station.</p>
                     <form id="returnBikeForm">
-                        <input type="number" id="return-transaction-id" placeholder="Transaction ID" required>
-                        <select id="return-station-id" required>
-                            <option value="">Select Return Station</option>
-                        </select>
-                        <button type="submit">🏁 Return Bike</button>
+                        <div class="form-group">
+                            <label for="return-transaction-id">Transaction ID</label>
+                            <input type="number" id="return-transaction-id" placeholder="Transaction ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="return-station-id">Return Station</label>
+                            <select id="return-station-id" required>
+                                <option value="">Select Return Station</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Return Bike</button>
                     </form>
                 </div>
                 
-                <div id="rental-history-section">
-                    <h3>📊 My Rental History</h3>
-                    <button onclick="loadMyRentals()">📈 Load History</button>
+                <div id="rental-history-section" class="subsection">
+                    <h3>My Rental History</h3>
+                    <button onclick="loadMyRentals()" class="btn-secondary">Load History</button>
                     <div id="rental-history"></div>
                 </div>
 
-                <div id="service-history-section">
-                    <h3>🔧 My Service Requests</h3>
-                    <button onclick="loadMyServiceRequests()">🛠️ Load Service History</button>
+                <div id="service-history-section" class="subsection">
+                    <h3>My Service Requests</h3>
+                    <button onclick="loadMyServiceRequests()" class="btn-secondary">Load Service History</button>
                     <div id="service-history"></div>
                 </div>
             </div>
             
             <div id="admin-section" class="section hidden">
-                <h2>⚙️ Admin Panel</h2>
-                <p>Manage stations, bikes, services, and view system analytics.</p>
+                <div class="section-header">
+                    <h2>Admin Panel</h2>
+                    <p>Manage stations, bikes, services, and view system analytics.</p>
+                </div>
                 
-                <div>
-                    <h3>🚏 Manage Stations</h3>
+                <div class="admin-subsection">
+                    <h3>Manage Stations</h3>
                     <form id="createStationForm">
-                        <input type="text" id="station-name" placeholder="Station Name" required>
-                        <input type="text" id="station-address" placeholder="Station Address" required>
-                        <select id="station-status">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                        <button type="submit">➕ Create Station</button>
+                        <div class="form-group">
+                            <label for="station-name">Station Name</label>
+                            <input type="text" id="station-name" placeholder="Station Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="station-address">Station Address</label>
+                            <input type="text" id="station-address" placeholder="Station Address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="station-status">Status</label>
+                            <select id="station-status">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Station</button>
                     </form>
                 </div>
                 
-                <div>
-                    <h3>🚲 Manage Bikes</h3>
+                <div class="admin-subsection">
+                    <h3>Manage Bikes</h3>
                     <form id="createBikeForm">
-                        <input type="text" id="bike-merk" placeholder="Bike Brand" required>
-                        <input type="text" id="bike-tipe" placeholder="Bike Type" required>
-                        <select id="bike-station-id">
-                            <option value="">Select Station</option>
-                        </select>
-                        <button type="submit">➕ Add New Bike</button>
+                        <div class="form-group">
+                            <label for="bike-merk">Bike Brand</label>
+                            <input type="text" id="bike-merk" placeholder="Bike Brand" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bike-tipe">Bike Type</label>
+                            <input type="text" id="bike-tipe" placeholder="Bike Type" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bike-station-id">Station</label>
+                            <select id="bike-station-id">
+                                <option value="">Select Station</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Add New Bike</button>
                     </form>
                 </div>
                 
-                <div>
-                    <h3>🛠️ Manage Services</h3>
+                <div class="admin-subsection">
+                    <h3>Manage Services</h3>
                     <form id="createServiceForm">
-                        <input type="text" id="service-name" placeholder="Service Name" required>
-                        <input type="text" id="service-desc" placeholder="Service Description" required>
-                        <input type="number" id="service-price" placeholder="Service Price (Rp)" required>
-                        <input type="number" id="service-base-cost" placeholder="Base Cost (Rp)" required>
-                        <button type="submit">➕ Create Service</button>
+                        <div class="form-group">
+                            <label for="service-name">Service Name</label>
+                            <input type="text" id="service-name" placeholder="Service Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-desc">Service Description</label>
+                            <input type="text" id="service-desc" placeholder="Service Description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-price">Service Price (Rp)</label>
+                            <input type="number" id="service-price" placeholder="Service Price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-base-cost">Base Cost (Rp)</label>
+                            <input type="number" id="service-base-cost" placeholder="Base Cost" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Service</button>
                     </form>
                 </div>
                 
-                <div>
-                    <h3>📊 Transaction Overview</h3>
-                    <button onclick="loadAllTransactions()">📈 Load All Transactions</button>
+                <div class="admin-subsection">
+                    <h3>Transaction Overview</h3>
+                    <button onclick="loadAllTransactions()" class="btn-secondary">Load All Transactions</button>
                     <div id="admin-transactions"></div>
                 </div>
             </div>
@@ -542,32 +250,32 @@
         <div id="rent-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-button" onclick="closeRentModal()">&times;</span>
-                <h2>🚲 Rent This Bike</h2>
+                <h2>Rent This Bike</h2>
                 <form id="rentModalForm">
                     <p>You are about to rent bike: <strong id="modal-bike-info"></strong></p>
 
                     <input type="hidden" id="modal-kendaraan-id">
                     <input type="hidden" id="modal-stasiun-id">
 
-                    <!-- <div id="modal-services-container">
-                        <h4>🛠️ Optional Services (check to add):</h4>
-                        <div id="services-list">
-                            <p>Loading available services...</p>
-                        </div>
-                    </div> -->
+                    <div class="form-group">
+                        <label for="modal-deposit">Enter Deposit Amount (Rp):</label>
+                        <input type="number" id="modal-deposit" placeholder="e.g., 50000" required>
+                    </div>
 
-                    <label for="modal-deposit">💰 Enter Deposit Amount (Rp):</label>
-                    <input type="number" id="modal-deposit" placeholder="e.g., 50000" required>
-
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button type="submit" style="flex: 1;">✅ Confirm Rent</button>
-                        <button type="button" onclick="closeRentModal()" class="secondary-btn" style="flex: 1;">❌ Cancel</button>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary">Confirm Rent</button>
+                        <button type="button" onclick="closeRentModal()" class="btn-secondary">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
-
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Institut Teknologi Sepuluh Nopember. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
@@ -579,4 +287,4 @@
     <script src="js/admin.js"></script>
     <script src="js/app.js"></script>
 </body>
-</html> 
+</html>
