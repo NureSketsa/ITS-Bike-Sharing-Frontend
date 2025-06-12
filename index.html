@@ -1,280 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ITS Bike Sharing System</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <img src="https://www.its.ac.id/wp-content/uploads/2020/07/Lambang-ITS-2-300x300.png" alt="ITS Logo" class="its-logo">
-                    <div class="title-section">
-                        <h1>Institut Teknologi Sepuluh Nopember</h1>
-                        <h2>Bike Sharing System</h2>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="header-content">
+          <div class="logo-section">
+            <img
+              src="https://www.its.ac.id/wp-content/uploads/2020/07/Lambang-ITS-2-300x300.png"
+              alt="ITS Logo"
+              class="its-logo"
+            />
+            <div class="title-section">
+              <h1>Institut Teknologi Sepuluh Nopember</h1>
+              <h2>Bike Sharing System</h2>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="container">
-        <div id="message" class="hidden"></div>
-        
-        <div id="auth-section" class="section">
-            <div class="auth-header">
-                <h2>Authentication</h2>
-                <p>Please login to access the ITS Bike Sharing System</p>
-            </div>
-            
-            <div id="login-form">
-                <h3>Sign In to Your Account</h3>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="login-nrp">NRP (Student/Staff ID)</label>
-                        <input type="text" id="login-nrp" placeholder="Enter your NRP" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <input type="password" id="login-password" placeholder="Enter your password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Sign In</button>
-                </form>
-                <button class="btn-secondary" onclick="showRegister()">Don't have an account? Register</button>
-            </div>
-            
-            <div id="register-form" class="hidden">
-                <h3>Create New Account</h3>
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label for="reg-nrp">NRP (Student/Staff ID)</label>
-                        <input type="text" id="reg-nrp" placeholder="NRP" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-nama">Full Name</label>
-                        <input type="text" id="reg-nama" placeholder="Full Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-email">Email Address</label>
-                        <input type="email" id="reg-email" placeholder="Email Address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-hp">Phone Number</label>
-                        <input type="text" id="reg-hp" placeholder="Phone Number" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-role">Role</label>
-                        <select id="reg-role">
-                            <option value="user">Regular User</option>
-                            <option value="admin">System Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-password">Password</label>
-                        <input type="password" id="reg-password" placeholder="Create Password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Create Account</button>
-                </form>
-                <button class="btn-secondary" onclick="showLogin()">Already have an account? Sign In</button>
-            </div>
+      <div id="message" class="hidden"></div>
+
+      <div id="auth-section" class="section">
+        <div class="auth-header">
+          <h2>Authentication</h2>
+          <p>Please login to access the ITS Bike Sharing System</p>
         </div>
-        
-        <div id="app-section" class="hidden">
-            <div id="user-info" class="section">
-                <h2>User Profile</h2>
-                <div id="profile-data"></div>
-                <button id="logoutButton" class="btn-secondary">Sign Out</button>
-            </div>
-            
-            <div class="nav-tabs">
-                <button onclick="showSection('stations')" id="stations-nav" class="nav-tab active">Stations</button>
-                <button onclick="showSection('bikes')" id="bikes-nav" class="nav-tab">Available Bikes</button>
-                <button onclick="showSection('rentals')" id="rentals-nav" class="nav-tab">My Rentals</button>
-                <button onclick="showSection('admin')" id="admin-nav" class="nav-tab hidden">Admin Panel</button>
-            </div>
-            
-            <div id="stations-section" class="section">
-                <div class="section-header">
-                    <h2>Bike Stations</h2>
-                    <p>Find the nearest bike station and check availability.</p>
-                </div>
-                <button onclick="loadStations()" class="btn-secondary">Refresh Stations</button>
-                <div id="stations-list"></div>
-            </div>
-            
-            <div id="bikes-section" class="section hidden">
-                <div class="section-header">
-                    <h2>Available Bikes</h2>
-                    <p>Browse and rent available bikes from different stations.</p>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="form-group">
-                        <label for="bike-station-filter">Filter by Station:</label>
-                        <select id="bike-station-filter" onchange="loadBikes()">
-                            <option value="">All Stations</option>
-                        </select>
-                    </div>
-                    <button onclick="loadBikes()" class="btn-secondary">Refresh Bikes</button>
-                </div>
-                
-                <div id="bikes-list"></div>
-            </div>
-            
-            <div id="rentals-section" class="section hidden">
-                <div class="section-header">
-                    <h2>Bike Rentals</h2>
-                </div>
-                
-                <div id="active-rental" class="subsection">
-                    <h3>Active Rentals</h3>
-                    <div id="active-rental-data">
-                        <div class="loading"></div> Loading active rentals...
-                    </div>
-                </div>
-                
-                <div id="return-bike" class="subsection">
-                    <h3>Return Bike</h3>
-                    <p>Return your rented bike to any available station.</p>
-                    <form id="returnBikeForm">
-                        <div class="form-group">
-                            <label for="return-transaction-id">Transaction ID</label>
-                            <input type="number" id="return-transaction-id" placeholder="Transaction ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="return-station-id">Return Station</label>
-                            <select id="return-station-id" required>
-                                <option value="">Select Return Station</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary">Return Bike</button>
-                    </form>
-                </div>
-                
-                <div id="rental-history-section" class="subsection">
-                    <h3>My Rental History</h3>
-                    <button onclick="loadMyRentals()" class="btn-secondary">Load History</button>
-                    <div id="rental-history"></div>
-                </div>
 
-                <div id="service-history-section" class="subsection">
-                    <h3>My Service Requests</h3>
-                    <button onclick="loadMyServiceRequests()" class="btn-secondary">Load Service History</button>
-                    <div id="service-history"></div>
-                </div>
+        <div id="login-form">
+          <h3>Sign In to Your Account</h3>
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="login-nrp">NRP (Student/Staff ID)</label>
+              <input
+                type="text"
+                id="login-nrp"
+                placeholder="Enter your NRP"
+                required
+              />
             </div>
-            
-            <div id="admin-section" class="section hidden">
-                <div class="section-header">
-                    <h2>Admin Panel</h2>
-                    <p>Manage stations, bikes, services, and view system analytics.</p>
-                </div>
-                
-                <div class="admin-subsection">
-                    <h3>Manage Stations</h3>
-                    <form id="createStationForm">
-                        <div class="form-group">
-                            <label for="station-name">Station Name</label>
-                            <input type="text" id="station-name" placeholder="Station Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="station-address">Station Address</label>
-                            <input type="text" id="station-address" placeholder="Station Address" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="station-status">Status</label>
-                            <select id="station-status">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary">Create Station</button>
-                    </form>
-                </div>
-                
-                <div class="admin-subsection">
-                    <h3>Manage Bikes</h3>
-                    <form id="createBikeForm">
-                        <div class="form-group">
-                            <label for="bike-merk">Bike Brand</label>
-                            <input type="text" id="bike-merk" placeholder="Bike Brand" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="bike-tipe">Bike Type</label>
-                            <input type="text" id="bike-tipe" placeholder="Bike Type" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="bike-station-id">Station</label>
-                            <select id="bike-station-id">
-                                <option value="">Select Station</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary">Add New Bike</button>
-                    </form>
-                </div>
-                
-                <div class="admin-subsection">
-                    <h3>Manage Services</h3>
-                    <form id="createServiceForm">
-                        <div class="form-group">
-                            <label for="service-name">Service Name</label>
-                            <input type="text" id="service-name" placeholder="Service Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="service-desc">Service Description</label>
-                            <input type="text" id="service-desc" placeholder="Service Description" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="service-price">Service Price (Rp)</label>
-                            <input type="number" id="service-price" placeholder="Service Price" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="service-base-cost">Base Cost (Rp)</label>
-                            <input type="number" id="service-base-cost" placeholder="Base Cost" required>
-                        </div>
-                        <button type="submit" class="btn-primary">Create Service</button>
-                    </form>
-                </div>
-                
-                <div class="admin-subsection">
-                    <h3>Transaction Overview</h3>
-                    <button onclick="loadAllTransactions()" class="btn-secondary">Load All Transactions</button>
-                    <div id="admin-transactions"></div>
-                </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                placeholder="Enter your password"
+                required
+              />
             </div>
+            <div style="text-align: center">
+              <button
+                type="submit"
+                class="btn-primary"
+                style="padding: 10px 100px"
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+          <br />
+          <div style="text-align: center">
+            <a class="linksActive" onclick="showRegister()">
+              Don't have an account? Register
+            </a>
+          </div>
         </div>
-        
-        <div id="rent-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-button" onclick="closeRentModal()">&times;</span>
-                <h2>Rent This Bike</h2>
-                <form id="rentModalForm">
-                    <p>You are about to rent bike: <strong id="modal-bike-info"></strong></p>
 
-                    <input type="hidden" id="modal-kendaraan-id">
-                    <input type="hidden" id="modal-stasiun-id">
-
-                    <div class="form-group">
-                        <label for="modal-deposit">Enter Deposit Amount (Rp):</label>
-                        <input type="number" id="modal-deposit" placeholder="e.g., 50000" required>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="submit" class="btn-primary">Confirm Rent</button>
-                        <button type="button" onclick="closeRentModal()" class="btn-secondary">Cancel</button>
-                    </div>
-                </form>
+        <div id="register-form" class="hidden">
+          <h3>Create New Account</h3>
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="reg-nrp">NRP (Student/Staff ID)</label>
+              <input type="text" id="reg-nrp" placeholder="NRP" required />
             </div>
+            <div class="form-group">
+              <label for="reg-nama">Full Name</label>
+              <input
+                type="text"
+                id="reg-nama"
+                placeholder="Full Name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email Address</label>
+              <input
+                type="email"
+                id="reg-email"
+                placeholder="Email Address"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="reg-hp">Phone Number</label>
+              <input
+                type="text"
+                id="reg-hp"
+                placeholder="Phone Number"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="reg-role">Role</label>
+              <select id="reg-role">
+                <option value="user">Regular User</option>
+                <option value="admin">System Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Password</label>
+              <input
+                type="password"
+                id="reg-password"
+                placeholder="Create Password"
+                required
+              />
+            </div>
+            <div style="text-align: center">
+              <button
+                type="submit"
+                class="btn-primary"
+                style="padding: 10px 100px"
+              >
+                Create Account
+              </button>
+            </div>
+          </form>
+          <br />
+          <div style="text-align: center">
+            <a
+              onclick="showLogin()"
+              style="background-color: white"
+              class="linksActive"
+            >
+              Already have an account? Sign In
+            </a>
+          </div>
         </div>
+      </div>
+
+      <div id="app-section" class="hidden">
+        <div id="user-info" class="section">
+          <h2>User Profile</h2>
+          <div id="profile-data"></div>
+          <button id="logoutButton" class="btn-secondary">Sign Out</button>
+        </div>
+
+        <div class="nav-tabs">
+          <button
+            onclick="showSection('stations')"
+            id="stations-nav"
+            class="nav-tab active"
+          >
+            Stations
+          </button>
+          <button onclick="showSection('bikes')" id="bikes-nav" class="nav-tab">
+            Available Bikes
+          </button>
+          <button
+            onclick="showSection('rentals')"
+            id="rentals-nav"
+            class="nav-tab"
+          >
+            My Rentals
+          </button>
+          <button
+            onclick="showSection('admin')"
+            id="admin-nav"
+            class="nav-tab hidden"
+          >
+            Admin Panel
+          </button>
+        </div>
+
+        <div id="stations-section" class="section">
+          <div class="section-header">
+            <h2>Bike Stations</h2>
+            <p>Find the nearest bike station and check availability.</p>
+          </div>
+          <button onclick="loadStations()" class="btn-secondary">
+            Refresh Stations
+          </button>
+          <div id="stations-list"></div>
+        </div>
+
+        <div id="bikes-section" class="section hidden">
+          <div class="section-header">
+            <h2>Available Bikes</h2>
+            <p>Browse and rent available bikes from different stations.</p>
+          </div>
+
+          <div class="filter-section">
+            <div class="form-group">
+              <label for="bike-station-filter">Filter by Station:</label>
+              <select id="bike-station-filter" onchange="loadBikes()">
+                <option value="">All Stations</option>
+              </select>
+            </div>
+            <button onclick="loadBikes()" class="btn-secondary">
+              Refresh Bikes
+            </button>
+          </div>
+
+          <div id="bikes-list"></div>
+        </div>
+
+        <div id="rentals-section" class="section hidden">
+          <div class="section-header">
+            <h2>Bike Rentals</h2>
+          </div>
+
+          <div id="active-rental" class="subsection">
+            <h3>Active Rentals</h3>
+            <div id="active-rental-data">
+              <div class="loading"></div>
+              Loading active rentals...
+            </div>
+          </div>
+
+          <div id="return-bike" class="subsection">
+            <h3>Return Bike</h3>
+            <p>Return your rented bike to any available station.</p>
+            <form id="returnBikeForm">
+              <div class="form-group">
+                <label for="return-transaction-id">Transaction ID</label>
+                <input
+                  type="number"
+                  id="return-transaction-id"
+                  placeholder="Transaction ID"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="return-station-id">Return Station</label>
+                <select id="return-station-id" required>
+                  <option value="">Select Return Station</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-primary">Return Bike</button>
+            </form>
+          </div>
+
+          <div id="rental-history-section" class="subsection">
+            <h3>My Rental History</h3>
+            <button onclick="loadMyRentals()" class="btn-secondary">
+              Load History
+            </button>
+            <div id="rental-history"></div>
+          </div>
+
+          <div id="service-history-section" class="subsection">
+            <h3>My Service Requests</h3>
+            <button onclick="loadMyServiceRequests()" class="btn-secondary">
+              Load Service History
+            </button>
+            <div id="service-history"></div>
+          </div>
+        </div>
+
+        <div id="admin-section" class="section hidden">
+          <div class="section-header">
+            <h2>Admin Panel</h2>
+            <p>Manage stations, bikes, services, and view system analytics.</p>
+          </div>
+
+          <div class="admin-subsection">
+            <h3>Manage Stations</h3>
+            <form id="createStationForm">
+              <div class="form-group">
+                <label for="station-name">Station Name</label>
+                <input
+                  type="text"
+                  id="station-name"
+                  placeholder="Station Name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="station-address">Station Address</label>
+                <input
+                  type="text"
+                  id="station-address"
+                  placeholder="Station Address"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="station-status">Status</label>
+                <select id="station-status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-primary">Create Station</button>
+            </form>
+          </div>
+
+          <div class="admin-subsection">
+            <h3>Manage Bikes</h3>
+            <form id="createBikeForm">
+              <div class="form-group">
+                <label for="bike-merk">Bike Brand</label>
+                <input
+                  type="text"
+                  id="bike-merk"
+                  placeholder="Bike Brand"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="bike-tipe">Bike Type</label>
+                <input
+                  type="text"
+                  id="bike-tipe"
+                  placeholder="Bike Type"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="bike-station-id">Station</label>
+                <select id="bike-station-id">
+                  <option value="">Select Station</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-primary">Add New Bike</button>
+            </form>
+          </div>
+
+          <div class="admin-subsection">
+            <h3>Manage Services</h3>
+            <form id="createServiceForm">
+              <div class="form-group">
+                <label for="service-name">Service Name</label>
+                <input
+                  type="text"
+                  id="service-name"
+                  placeholder="Service Name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="service-desc">Service Description</label>
+                <input
+                  type="text"
+                  id="service-desc"
+                  placeholder="Service Description"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="service-price">Service Price (Rp)</label>
+                <input
+                  type="number"
+                  id="service-price"
+                  placeholder="Service Price"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="service-base-cost">Base Cost (Rp)</label>
+                <input
+                  type="number"
+                  id="service-base-cost"
+                  placeholder="Base Cost"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-primary">Create Service</button>
+            </form>
+          </div>
+
+          <div class="admin-subsection">
+            <h3>Transaction Overview</h3>
+            <button onclick="loadAllTransactions()" class="btn-secondary">
+              Load All Transactions
+            </button>
+            <div id="admin-transactions"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="rent-modal" class="modal hidden">
+        <div class="modal-content">
+          <span class="close-button" onclick="closeRentModal()">&times;</span>
+          <h2>Rent This Bike</h2>
+          <form id="rentModalForm">
+            <p>
+              You are about to rent bike: <strong id="modal-bike-info"></strong>
+            </p>
+
+            <input type="hidden" id="modal-kendaraan-id" />
+            <input type="hidden" id="modal-stasiun-id" />
+
+            <div class="form-group">
+              <label for="modal-deposit">Enter Deposit Amount (Rp):</label>
+              <input
+                type="number"
+                id="modal-deposit"
+                placeholder="e.g., 50000"
+                required
+              />
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn-primary">Confirm Rent</button>
+              <button
+                type="button"
+                onclick="closeRentModal()"
+                class="btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 Institut Teknologi Sepuluh Nopember. All rights reserved.</p>
-        </div>
+      <div class="container">
+        <p>
+          &copy; 2025 Institut Teknologi Sepuluh Nopember. All rights reserved.
+        </p>
+      </div>
     </footer>
 
     <script src="js/config.js"></script>
@@ -286,5 +441,5 @@
     <script src="js/services.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/app.js"></script>
-</body>
+  </body>
 </html>
