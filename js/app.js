@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form listeners untuk feature modules
     document.getElementById('createStationForm').addEventListener('submit', createStation);
     document.getElementById('createBikeForm').addEventListener('submit', createBike);
-    document.getElementById('createServiceForm').addEventListener('submit', createService);
+    // document.getElementById('createServiceForm').addEventListener('submit', createService);
     document.getElementById('returnBikeForm').addEventListener('submit', returnBike);
-    document.getElementById('requestServiceForm').addEventListener('submit', requestService);
+    // document.getElementById('requestServiceForm').addEventListener('submit', requestService);
     
     // LISTENER BARU: Untuk form sewa di dalam modal
     document.getElementById('rentModalForm').addEventListener('submit', submitRentFromModal);
